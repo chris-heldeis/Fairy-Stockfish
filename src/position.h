@@ -53,7 +53,8 @@ struct StateInfo {
   int    countingLimit;
   CheckCount checksRemaining[COLOR_NB];
   Square epSquare;
-  Square castlingKingSquare[COLOR_NB];
+  Square castlingKingSquare[COLOR_NB];  
+  Score  psq;
   Bitboard gatesBB[COLOR_NB];
 
   // Not copied when making a move (will be recomputed anyhow)
@@ -78,6 +79,9 @@ struct StateInfo {
   bool       pass;
   Move       move;
   int        repetition;
+  Gate       gate;
+  Gate       capturedGate;
+  PieceType  removedGatingType;
 
   // Used by NNUE
   Eval::NNUE::Accumulator accumulator;
@@ -170,6 +174,7 @@ public:
   bool gating() const;
   bool arrow_gating() const;
   bool seirawan_gating() const;
+  bool musketeer_gating() const;
   bool cambodian_moves() const;
   Bitboard diagonal_lines() const;
   bool pass() const;
@@ -226,6 +231,10 @@ public:
   template<PieceType Pt> Square square(Color c) const;
   Square square(Color c, PieceType pt) const;
   bool is_on_semiopen_file(Color c, Square s) const;
+  Bitboard gates() const;
+  PieceType gating_piece(Gate gate) const;
+  PieceType gating_piece(Square s) const;
+  Square musketeer_gating_square(Color c, Gate gate) const;
 
   // Castling
   CastlingRights castling_rights(Color c) const;
@@ -302,6 +311,9 @@ public:
   Score psq_score() const;
   Value non_pawn_material(Color c) const;
   Value non_pawn_material() const;
+  GamePhase game_phase() const;
+  Gate gate_count() const;
+  Gate setup_count(Color c) const;
 
   // Position consistency check, for debugging
   bool pos_is_ok() const;
@@ -322,7 +334,17 @@ private:
   // Other helpers
   void move_piece(Square from, Square to);
   template<bool Do>
-  void do_castling(Color us, Square from, Square& to, Square& rfrom, Square& rto);
+  void do_castling(Color us, Square from, Square& to, Square& rfrom, Square& rto, Key& k);
+  void set_gating_type(PieceType pt);
+  void unset_gating_type();
+  void add_gate(Color c, Square s, Gate gate);
+  void remove_gate(Color c, Square s, Gate gate);
+  void put_gating_piece(Color c, Square s);
+  void remove_gating_piece(Color c, Square s);
+  void capture_gate(Color c, Square s);
+  void uncapture_gate(Color c, Square s);
+  void gate_piece(Color c, Square s);
+  void ungate_piece(Color c, Square s);
 
   // Data members
   Piece board[SQUARE_NB];
@@ -338,6 +360,12 @@ private:
   int gamePly;
   Color sideToMove;
   Score psq;
+  Gate gateBoard[SQUARE_NB];
+  PieceType gatingPieces[GATE_NB + 1];
+  Square gatingSquares[COLOR_NB][GATE_NB];
+  Bitboard gateBB;
+  Gate gateCount;
+  Gate setupCount[COLOR_NB];
 
   // variant-specific
   const Variant* var;
@@ -720,6 +748,11 @@ inline bool Position::seirawan_gating() const {
   return var->seirawanGating;
 }
 
+inline bool Position::musketeer_gating() const {
+  assert(var != nullptr);
+  return var->musketeerGating;
+}
+
 inline bool Position::cambodian_moves() const {
   assert(var != nullptr);
   return var->cambodianMoves;
@@ -949,6 +982,8 @@ inline Piece Position::unpromoted_piece_on(Square s) const {
 }
 
 inline Piece Position::moved_piece(Move m) const {
+  if (type_of(m) == SET_GATING_TYPE || type_of(m) == PUT_GATING_PIECE)
+      return make_piece(sideToMove, musketeer_gating_type(m));
   if (type_of(m) == DROP)
       return make_piece(sideToMove, dropped_piece_type(m));
   return piece_on(from_sq(m));
@@ -1006,6 +1041,26 @@ template<PieceType Pt> inline Square Position::square(Color c) const {
 inline Square Position::square(Color c, PieceType pt) const {
   assert(count(c, pt) == 1);
   return lsb(pieces(c, pt));
+}
+
+inline Bitboard Position::gates() const {
+  return gateBB;
+}
+
+inline PieceType Position::gating_piece(Gate gate) const {
+  assert(gate >= NO_GATE && gate < GATE_NB);
+  return gatingPieces[gate];
+}
+
+inline PieceType Position::gating_piece(Square s) const {
+  assert(rank_of(s) == RANK_1 || rank_of(s) == RANK_8);
+  assert(gateBoard[s] > NO_GATE && gateBoard[s] < GATE_NB);
+  return gating_piece(gateBoard[s]);
+}
+
+inline Square Position::musketeer_gating_square(Color c, Gate gate) const {
+  assert(gate < GATE_NB);
+  return gatingSquares[c][gate];
 }
 
 inline Square Position::ep_square() const {
@@ -1166,6 +1221,20 @@ inline Value Position::non_pawn_material() const {
   return non_pawn_material(WHITE) + non_pawn_material(BLACK);
 }
 
+inline GamePhase Position::game_phase() const {
+  return  gateCount < GATE_NB - 1 ? GAMEPHASE_SELECTION
+        : setupCount[sideToMove] < GATE_NB - 1 ? GAMEPHASE_PLACING
+        : GAMEPHASE_PLAYING;
+}
+
+inline Gate Position::gate_count() const {
+  return gateCount;
+}
+
+inline Gate Position::setup_count(Color c) const {
+  return setupCount[c];
+}
+
 inline int Position::game_ply() const {
   return gamePly;
 }
@@ -1214,6 +1283,68 @@ inline Piece Position::captured_piece() const {
 
 inline Thread* Position::this_thread() const {
   return thisThread;
+}
+
+inline void Position::set_gating_type(PieceType pt) {
+  assert(gateCount < GATE_NB);
+  gatingPieces[++gateCount] = pt;
+}
+
+inline void Position::unset_gating_type() {
+  assert(gateCount > NO_GATE);
+  gatingPieces[gateCount--] = NO_PIECE_TYPE;
+}
+
+inline void Position::add_gate(Color c, Square s, Gate gate) {
+  assert(gate > NO_GATE && gate < GATE_NB);
+  assert(!(gateBB & s));
+  assert(gateBoard[s] == NO_GATE);
+  gateBoard[s] = gate;
+  gatingSquares[c][gate] = s;
+  gateBB |= s;
+}
+
+inline void Position::remove_gate(Color c, Square s, Gate gate) {
+  assert(gate > NO_GATE && gate < GATE_NB);
+  assert(gateBB & s);
+  assert(gateBoard[s] > NO_GATE);
+  gateBoard[s] = NO_GATE;
+  gatingSquares[c][gate] = SQ_NONE;
+  gateBB ^= s;
+}
+
+inline void Position::put_gating_piece(Color c, Square s) {
+  add_gate(c, s, ++setupCount[c]);
+}
+
+inline void Position::remove_gating_piece(Color c, Square s) {
+  remove_gate(c, s, setupCount[c]--);
+}
+
+inline void Position::capture_gate(Color c, Square s) {
+  assert(gatingPieces[gateBoard[s]] > NO_PIECE_TYPE);
+  st->capturedGate = gateBoard[s];
+  remove_gate(c, s, gateBoard[s]);
+}
+
+inline void Position::uncapture_gate(Color c, Square s) {
+  assert(board[s] != NO_PIECE);
+  add_gate(c, s, st->capturedGate);
+}
+
+inline void Position::gate_piece(Color c, Square s) {
+  assert(gatingPieces[gateBoard[s]] > NO_PIECE_TYPE);
+  assert(board[s] == NO_PIECE);
+  st->gate = gateBoard[s];
+  put_piece(make_piece(c, gatingPieces[gateBoard[s]]), s);
+  remove_gate(c, s, gateBoard[s]);
+}
+
+inline void Position::ungate_piece(Color c, Square s) {
+  assert(board[s] != NO_PIECE);
+  assert(gatingPieces[st->gate] == type_of(board[s]));
+  add_gate(c, s, st->gate);
+  remove_piece(s);
 }
 
 inline void Position::put_piece(Piece pc, Square s, bool isPromoted, Piece unpromotedPc) {

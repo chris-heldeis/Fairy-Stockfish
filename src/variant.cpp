@@ -535,6 +535,33 @@ namespace {
         v->promotionPieceTypes = {ARCHBISHOP, CHANCELLOR, QUEEN, ROOK, BISHOP, KNIGHT};
         return v;
     }
+    // Musketeer Chess
+    // https://musketeerchess.net
+    // A Seirawan-inspired variant with unique gating mechanics.
+    // Pieces are introduced to predefined squares, chosen before game start, this is named Gating Selection = Where the chosen piece is going to be gated
+    // Gating of the additional pieces is activated when first-rank pieces move for the first time. Only the additional piece waiting to be gated on that specific square can be introduced.
+    // Features a variety of new pieces, thus there is a piece selection step where both players must agree to chose the additional piece combination.
+    // In Fairy Stockfish the Piece Selection is determined at the PieceToCharTable, this default combination can be changed in variant.ini
+    Variant* musketeer_variant() {
+        Variant* v = chess_variant_base()->init();
+        v->variantTemplate = "seirawan";
+        v->pieceToCharTable = "PNBRQ.E....C.AF.MH.SU........D............LKpnbrq.e....c.af.mh.su........d............lk";
+        v->pieceToChar = " PNBRQ" + std::string(ARCHBISHOP - QUEEN - 1, ' ') + "AMDCLSUHEF" + std::string(KING - FORTRESS - 1, ' ') + "K" + std::string(PIECE_TYPE_NB - KING - 1, ' ')
+            + " pnbrq" + std::string(ARCHBISHOP - QUEEN - 1, ' ') + "amdclsuhef" + std::string(KING - FORTRESS - 1, ' ') + "k" + std::string(PIECE_TYPE_NB - KING - 1, ' ');
+        v->add_piece(ARCHBISHOP, 'a', "NB");
+        v->add_piece(CHANCELLOR, 'm', "NR");
+        v->add_piece(AMAZON, 'd', "QN"); // also called Dragon in Musketeer, but Amazon is the most accurate  
+        v->add_piece(MUSKETEER_CANNON, 'c', "llNrrNDK");
+        v->add_piece(LEOPARD, 'l', "NB2");
+        v->add_piece(SPIDER, 's', "B2DN");
+        v->add_piece(UNICORN, 'u', "CN");
+        v->add_piece(HAWK, 'h', "DHAG");
+        v->add_piece(MUSKETEER_ELEPHANT, 'e', "KDA");
+        v->add_piece(FORTRESS, 'f', "B3DfNbN");
+        v->startFen = "lc******/rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/LC****** w KQBCDFGkqbcdfg - 0 1";
+        v->musketeerGating = true;
+        return v;
+    }
     // S-House
     // A hybrid variant of S-Chess and Crazyhouse.
     // Pieces in the pocket can either be gated or dropped.
@@ -1410,6 +1437,7 @@ void VariantMap::init() {
     add("placement", placement_variant());
     add("sittuyin", sittuyin_variant());
     add("seirawan", seirawan_variant());
+    add("musketeer", musketeer_variant());
     add("shouse", shouse_variant());
     add("minishogi", minishogi_variant());
     add("mini", minishogi_variant());

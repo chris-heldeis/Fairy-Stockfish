@@ -58,6 +58,78 @@ Magic* magics[] = {BishopMagics, RookMagicsH, RookMagicsV, CannonMagicsH, Cannon
                    HorseMagics, ElephantMagics, JanggiElephantMagics, CannonDiagMagics, NightriderMagics,
                    GrasshopperMagicsH, GrasshopperMagicsV, GrasshopperMagicsD};
 
+int steps[QUEEN + 1][17] = {
+    {}, // NO_PIECE_TYPE
+    { 7, 9 }, // Pawn
+    { -17, -15, -10, -6, 6, 10, 15, 17 }, // Knight
+    {}, // Bishop
+    {}, // Rook
+    {} // Queen
+};
+Direction slider[QUEEN + 1][9] = {
+    {}, // NO_PIECE_TYPE
+    {}, // Pawn
+    {}, // Knight
+    { NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST }, // Bishop
+    { NORTH,  EAST,  SOUTH,  WEST }, // Rook
+    { NORTH,  EAST,  SOUTH,  WEST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST } // Queen
+};
+int slider_dist[QUEEN + 1] = {
+    0, // NO_PIECE_TYPE
+    0, // Pawn
+    0, // Knight
+    7, // Bishop
+    7, // Rook
+    7 // Queen
+};
+
+int king_steps[17] = { -9, -8, -7, -1, 1, 7, 8, 9 };
+Direction king_slider[9] = {};
+int king_slider_dist = 0;
+
+int musketeer_steps[MUSKETEER_PIECES_NB][17] = {
+    { -17, -15, -10, -6, 6, 10, 15, 17 }, // Archbishop
+    { -17, -15, -10, -6, 6, 10, 15, 17 }, // Chancellor
+    { -17, -15, -10, -6, 6, 10, 15, 17 }, // Dragon
+    { -16, -10, -9, -8, -7, -6, -2, -1,
+        16,  10,  9,  8,  7,  6,  2,  1 }, // Cannon
+    { -17, -15, -10, -6, 6, 10, 15, 17 }, // Leopard
+    { -17, -16, -15, -10, -6, -2,
+        17,  16,  15,  10,  6,  2 }, // Spider
+    { -25, -23, -17, -15, -11, -10, -6, -5,
+        25,  23,  17,  15,  11,  10,  6,  5}, // Unicorn
+    { -27, -24, -21, -18, -16, -14, -3, -2,
+        27,  24,  21,  18,  16,  14,  3,  2 }, // Hawk
+    { -18, -16, -14, -9, -8, -7, -2, -1,
+        18,  16,  14,  9,  8,  7,  2,  1 }, // Elephant
+    { -17, -16, -15, -2,
+        17,  16,  15,  2 } // Fortress
+};
+Direction musketeer_slider[MUSKETEER_PIECES_NB][9] = {
+    { NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST }, // Archbishop
+    { NORTH,  EAST,  SOUTH,  WEST }, // Chancellor
+    { NORTH,  EAST,  SOUTH,  WEST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST }, // Dragon
+    {}, // Cannon
+    { NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST }, // Leopard
+    { NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST }, // Spider
+    {}, // Unicorn
+    {}, // Hawk
+    {}, // Elephant
+    { NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST } // Fortress
+};
+int musketeer_slider_dist[MUSKETEER_PIECES_NB] = {
+    7, // Archbishop
+    7, // Chancellor
+    7, // Dragon
+    0, // Cannon
+    2, // Leopard
+    2, // Spider
+    0, // Unicorn
+    0, // Hawk
+    0, // Elephant
+    3 // Fortress
+};
+
 namespace {
 
 // Some magics need to be split in order to reduce memory consumption.
@@ -290,6 +362,44 @@ void Bitboards::init_pieces() {
   }
 }
 
+inline Bitboard sliding_attack(Direction directions[], Square sq, Bitboard occupied, int max_dist = 7) {
+
+    Bitboard attack = 0;
+
+    for (int i = 0; directions[i]; ++i)
+        for (Square s = sq + directions[i];
+                is_ok(s) && distance(s, s - directions[i]) == 1 && distance(s, sq) <= max_dist;
+                s += directions[i])
+        {
+            attack |= s;
+
+            if (occupied & s)
+                break;
+        }
+
+    return attack;
+}
+
+inline int get_step(PieceType pt, int i)
+{
+    return pt <= QUEEN ? steps[pt][i]
+        : pt >= ARCHBISHOP && pt <= FORTRESS ? musketeer_steps[pt - ARCHBISHOP][i]
+        : king_steps[i];
+}
+
+inline Direction* get_slider(PieceType pt)
+{
+    return pt <= QUEEN ? slider[pt]
+        : pt >= ARCHBISHOP && pt <= FORTRESS ? musketeer_slider[pt - ARCHBISHOP]
+        : king_slider;
+}
+
+inline int get_slider_dist(PieceType pt)
+{
+    return pt <= QUEEN ? slider_dist[pt]
+        : pt >= ARCHBISHOP && pt <= FORTRESS ? musketeer_slider_dist[pt - ARCHBISHOP]
+        : king_slider_dist;
+}
 
 /// Bitboards::init() initializes various bitboard tables. It is called at
 /// startup and relies on global objects to be already zero-initialized.
@@ -341,6 +451,27 @@ void Bitboards::init() {
 #endif
 
   init_pieces();
+
+  for (Color c : {WHITE, BLACK})
+      for (PieceType pt = PAWN; pt <= KING; ++pt)
+      {
+          if (!(pt <= QUEEN || (pt >= ARCHBISHOP && pt <= FORTRESS) || pt == KING))
+              continue;
+          for (Square s = SQ_A1; s <= SQ_H8; ++s)
+          {
+              for (int i = 0; get_step(pt, i); ++i)
+              {
+                  Square to = s + Direction(c == WHITE ? get_step(pt, i) : -get_step(pt, i));
+
+                  if (is_ok(to) && distance(s, to) < 4)
+                  {
+                      PseudoAttacks[c][pt][s] |= to;
+                      LeaperAttacks[c][pt][s] |= to;
+                  }
+              }
+              PseudoAttacks[c][pt][s] |= sliding_attack(get_slider(pt), s, 0, get_slider_dist(pt));
+          }
+      }
 
   for (Square s1 = SQ_A1; s1 <= SQ_MAX; ++s1)
   {

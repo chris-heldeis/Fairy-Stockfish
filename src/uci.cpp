@@ -476,6 +476,13 @@ string UCI::move(const Position& pos, Move m) {
   if (m == MOVE_NULL)
       return "0000";
 
+  if (type_of(m) == SET_GATING_TYPE)
+      return string(1, pos.piece_to_char()[make_piece(WHITE, musketeer_gating_type(m))]);
+
+  if (type_of(m) == PUT_GATING_PIECE)
+      return string{pos.piece_to_char()[make_piece(WHITE, musketeer_gating_type(m))], '@'}
+          + string{char('a' + file_of(to)), rank_of(to) == RANK_8 ? '9' : '0'};
+
   if (is_pass(m) && Options["Protocol"] == "xboard")
       return "@@@@";
 

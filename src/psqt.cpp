@@ -42,8 +42,8 @@ Value PieceValue[PHASE_NB][PIECE_NB] = {
     FersAlfilValueMg, SilverValueMg, AiwokValueMg, BersValueMg, ArchbishopValueMg, ChancellorValueMg, AmazonValueMg, KnibisValueMg,
     BiskniValueMg, KnirooValueMg, RookniValueMg, ShogiPawnValueMg, LanceValueMg, ShogiKnightValueMg, GoldValueMg, DragonHorseValueMg,
     ClobberPieceValueMg, BreakthroughPieceValueMg, ImmobilePieceValueMg, CannonPieceValueMg, JanggiCannonPieceValueMg, SoldierValueMg, HorseValueMg, ElephantValueMg,
-    JanggiElephantValueMg, BannerValueMg, WazirValueMg, CommonerValueMg, CentaurValueMg, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
-    VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
+    JanggiElephantValueMg, BannerValueMg, WazirValueMg, CommonerValueMg, CentaurValueMg, MusketeerCannonValueMg, LeopardValueMg, SpiderValueMg,
+    UnicornValueMg, HawkValueMg, MusketeerElephantValueMg, FortressValueMg, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
     VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
     VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
 
@@ -51,8 +51,8 @@ Value PieceValue[PHASE_NB][PIECE_NB] = {
     FersAlfilValueMg, SilverValueMg, AiwokValueMg, BersValueMg, ArchbishopValueMg, ChancellorValueMg, AmazonValueMg, KnibisValueMg,
     BiskniValueMg, KnirooValueMg, RookniValueMg, ShogiPawnValueMg, LanceValueMg, ShogiKnightValueMg, GoldValueMg, DragonHorseValueMg,
     ClobberPieceValueMg, BreakthroughPieceValueMg, ImmobilePieceValueMg, CannonPieceValueMg, JanggiCannonPieceValueMg, SoldierValueMg, HorseValueMg, ElephantValueMg,
-    JanggiElephantValueMg, BannerValueMg, WazirValueMg, CommonerValueMg, CentaurValueMg, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
-    VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
+    JanggiElephantValueMg, BannerValueMg, WazirValueMg, CommonerValueMg, CentaurValueMg, MusketeerCannonValueMg, LeopardValueMg, SpiderValueMg,
+    UnicornValueMg, HawkValueMg, MusketeerElephantValueMg, FortressValueMg, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
     VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
     VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
   },
@@ -61,8 +61,8 @@ Value PieceValue[PHASE_NB][PIECE_NB] = {
     FersAlfilValueEg, SilverValueEg, AiwokValueEg, BersValueEg, ArchbishopValueEg, ChancellorValueEg, AmazonValueEg, KnibisValueEg,
     BiskniValueEg, KnirooValueEg, RookniValueEg, ShogiPawnValueEg, LanceValueEg, ShogiKnightValueEg, GoldValueEg, DragonHorseValueEg,
     ClobberPieceValueEg, BreakthroughPieceValueEg, ImmobilePieceValueEg, CannonPieceValueEg, JanggiCannonPieceValueEg, SoldierValueEg, HorseValueEg, ElephantValueEg,
-    JanggiElephantValueEg, BannerValueEg, WazirValueEg, CommonerValueEg, CentaurValueEg, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
-    VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
+    JanggiElephantValueEg, BannerValueEg, WazirValueEg, CommonerValueEg, CentaurValueEg, MusketeerCannonValueEg, LeopardValueEg, SpiderValueEg,
+    UnicornValueEg, HawkValueEg, MusketeerElephantValueEg, FortressValueEg, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
     VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
     VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
 
@@ -70,8 +70,8 @@ Value PieceValue[PHASE_NB][PIECE_NB] = {
     FersAlfilValueEg, SilverValueEg, AiwokValueEg, BersValueEg, ArchbishopValueEg, ChancellorValueEg, AmazonValueEg, KnibisValueEg,
     BiskniValueEg, KnirooValueEg, RookniValueEg, ShogiPawnValueEg, LanceValueEg, ShogiKnightValueEg, GoldValueEg, DragonHorseValueEg,
     ClobberPieceValueEg, BreakthroughPieceValueEg, ImmobilePieceValueEg, CannonPieceValueEg, JanggiCannonPieceValueEg, SoldierValueEg, HorseValueEg, ElephantValueEg,
-    JanggiElephantValueEg, BannerValueEg, WazirValueEg, CommonerValueEg, CentaurValueEg, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
-    VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
+    JanggiElephantValueEg, BannerValueEg, WazirValueEg, CommonerValueEg, CentaurValueEg, MusketeerCannonValueEg, LeopardValueEg, SpiderValueEg,
+    UnicornValueEg, HawkValueEg, MusketeerElephantValueEg, FortressValueEg, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
     VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
     VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO, VALUE_ZERO,
   },
@@ -152,6 +152,109 @@ constexpr Score PBonus[RANK_NB][FILE_NB] =
    { S( -7, -1), S(  6,-14), S( -2, 13), S(-11, 22), S(  4, 24), S(-14, 17), S( 10,  7), S( -9,  7) }
   };
 
+constexpr Score MusketeerBonus[MUSKETEER_PIECES_NB][RANK_NB][int(FILE_NB) / 2] = {
+  { // Archbishop
+   { S( 0,-71), S(-4,-56), S(-3,-42), S(-1,-29) },
+   { S(-4,-56), S( 6,-30), S( 9,-21), S( 8, -5) },
+   { S(-2,-39), S( 6,-17), S( 9, -8), S( 9,  5) },
+   { S(-1,-29), S( 8, -5), S(10,  9), S( 7, 19) },
+   { S(-3,-27), S( 9, -5), S( 8, 10), S( 7, 21) },
+   { S(-2,-40), S( 6,-16), S( 8,-10), S(10,  3) },
+   { S(-2,-55), S( 7,-30), S( 7,-21), S( 6, -6) },
+   { S(-1,-74), S(-4,-55), S(-1,-43), S( 0,-30) }
+  },
+  { // Chancellor
+   { S( 0,-71), S(-4,-56), S(-3,-42), S(-1,-29) },
+   { S(-4,-56), S( 6,-30), S( 9,-21), S( 8, -5) },
+   { S(-2,-39), S( 6,-17), S( 9, -8), S( 9,  5) },
+   { S(-1,-29), S( 8, -5), S(10,  9), S( 7, 19) },
+   { S(-3,-27), S( 9, -5), S( 8, 10), S( 7, 21) },
+   { S(-2,-40), S( 6,-16), S( 8,-10), S(10,  3) },
+   { S(-2,-55), S( 7,-30), S( 7,-21), S( 6, -6) },
+   { S(-1,-74), S(-4,-55), S(-1,-43), S( 0,-30) }
+  },
+  { // Dragon
+   { S( 0,-71), S(-4,-56), S(-3,-42), S(-1,-29) },
+   { S(-4,-56), S( 6,-30), S( 9,-21), S( 8, -5) },
+   { S(-2,-39), S( 6,-17), S( 9, -8), S( 9,  5) },
+   { S(-1,-29), S( 8, -5), S(10,  9), S( 7, 19) },
+   { S(-3,-27), S( 9, -5), S( 8, 10), S( 7, 21) },
+   { S(-2,-40), S( 6,-16), S( 8,-10), S(10,  3) },
+   { S(-2,-55), S( 7,-30), S( 7,-21), S( 6, -6) },
+   { S(-1,-74), S(-4,-55), S(-1,-43), S( 0,-30) }
+  },
+  { // Cannon
+   { S( 0,-71), S(-4,-56), S(-3,-42), S(-1,-29) },
+   { S(-4,-56), S( 6,-30), S( 9,-21), S( 8, -5) },
+   { S(-2,-39), S( 6,-17), S( 9, -8), S( 9,  5) },
+   { S(-1,-29), S( 8, -5), S(10,  9), S( 7, 19) },
+   { S(-3,-27), S( 9, -5), S( 8, 10), S( 7, 21) },
+   { S(-2,-40), S( 6,-16), S( 8,-10), S(10,  3) },
+   { S(-2,-55), S( 7,-30), S( 7,-21), S( 6, -6) },
+   { S(-1,-74), S(-4,-55), S(-1,-43), S( 0,-30) }
+  },
+  { // Leopard
+   { S( 0,-71), S(-4,-56), S(-3,-42), S(-1,-29) },
+   { S(-4,-56), S( 6,-30), S( 9,-21), S( 8, -5) },
+   { S(-2,-39), S( 6,-17), S( 9, -8), S( 9,  5) },
+   { S(-1,-29), S( 8, -5), S(10,  9), S( 7, 19) },
+   { S(-3,-27), S( 9, -5), S( 8, 10), S( 7, 21) },
+   { S(-2,-40), S( 6,-16), S( 8,-10), S(10,  3) },
+   { S(-2,-55), S( 7,-30), S( 7,-21), S( 6, -6) },
+   { S(-1,-74), S(-4,-55), S(-1,-43), S( 0,-30) }
+  },
+  { // Spider
+   { S( 0,-71), S(-4,-56), S(-3,-42), S(-1,-29) },
+   { S(-4,-56), S( 6,-30), S( 9,-21), S( 8, -5) },
+   { S(-2,-39), S( 6,-17), S( 9, -8), S( 9,  5) },
+   { S(-1,-29), S( 8, -5), S(10,  9), S( 7, 19) },
+   { S(-3,-27), S( 9, -5), S( 8, 10), S( 7, 21) },
+   { S(-2,-40), S( 6,-16), S( 8,-10), S(10,  3) },
+   { S(-2,-55), S( 7,-30), S( 7,-21), S( 6, -6) },
+   { S(-1,-74), S(-4,-55), S(-1,-43), S( 0,-30) }
+  },
+  { // Unicorn
+   { S( 0,-71), S(-4,-56), S(-3,-42), S(-1,-29) },
+   { S(-4,-56), S( 6,-30), S( 9,-21), S( 8, -5) },
+   { S(-2,-39), S( 6,-17), S( 9, -8), S( 9,  5) },
+   { S(-1,-29), S( 8, -5), S(10,  9), S( 7, 19) },
+   { S(-3,-27), S( 9, -5), S( 8, 10), S( 7, 21) },
+   { S(-2,-40), S( 6,-16), S( 8,-10), S(10,  3) },
+   { S(-2,-55), S( 7,-30), S( 7,-21), S( 6, -6) },
+   { S(-1,-74), S(-4,-55), S(-1,-43), S( 0,-30) }
+  },
+  { // Hawk
+   { S( 0,-71), S(-4,-56), S(-3,-42), S(-1,-29) },
+   { S(-4,-56), S( 6,-30), S( 9,-21), S( 8, -5) },
+   { S(-2,-39), S( 6,-17), S( 9, -8), S( 9,  5) },
+   { S(-1,-29), S( 8, -5), S(10,  9), S( 7, 19) },
+   { S(-3,-27), S( 9, -5), S( 8, 10), S( 7, 21) },
+   { S(-2,-40), S( 6,-16), S( 8,-10), S(10,  3) },
+   { S(-2,-55), S( 7,-30), S( 7,-21), S( 6, -6) },
+   { S(-1,-74), S(-4,-55), S(-1,-43), S( 0,-30) }
+  },
+  { // Elephant
+   { S( 0,-71), S(-4,-56), S(-3,-42), S(-1,-29) },
+   { S(-4,-56), S( 6,-30), S( 9,-21), S( 8, -5) },
+   { S(-2,-39), S( 6,-17), S( 9, -8), S( 9,  5) },
+   { S(-1,-29), S( 8, -5), S(10,  9), S( 7, 19) },
+   { S(-3,-27), S( 9, -5), S( 8, 10), S( 7, 21) },
+   { S(-2,-40), S( 6,-16), S( 8,-10), S(10,  3) },
+   { S(-2,-55), S( 7,-30), S( 7,-21), S( 6, -6) },
+   { S(-1,-74), S(-4,-55), S(-1,-43), S( 0,-30) }
+  },
+  { // Fortress
+   { S( 0,-71), S(-4,-56), S(-3,-42), S(-1,-29) },
+   { S(-4,-56), S( 6,-30), S( 9,-21), S( 8, -5) },
+   { S(-2,-39), S( 6,-17), S( 9, -8), S( 9,  5) },
+   { S(-1,-29), S( 8, -5), S(10,  9), S( 7, 19) },
+   { S(-3,-27), S( 9, -5), S( 8, 10), S( 7, 21) },
+   { S(-2,-40), S( 6,-16), S( 8,-10), S(10,  3) },
+   { S(-2,-55), S( 7,-30), S( 7,-21), S( 6, -6) },
+   { S(-1,-74), S(-4,-55), S(-1,-43), S( 0,-30) }
+  }
+};
+
 // Estimate piece value
 Value piece_value(Phase phase, PieceType pt)
 {
@@ -176,6 +279,7 @@ namespace PSQT
 {
 
 Score psq[PIECE_NB][SQUARE_NB + 1];
+Score psq_gate[PIECE_NB][FILE_NB];
 
 // PSQT::init() initializes piece-square tables: the white halves of the tables are
 // copied from Bonus[] and PBonus[], adding the piece value, then the black halves of
@@ -204,6 +308,12 @@ void init(const Variant* v) {
       Piece pc = make_piece(WHITE, pt);
 
       Score score = make_score(PieceValue[MG][pc], PieceValue[EG][pc]);
+      
+      for (File f = FILE_A; f <= FILE_H; ++f)
+      {
+          psq_gate[ pc][ f] = score;
+          psq_gate[~pc][~f] = -psq_gate[pc][f];
+      }
 
       // Consider promotion types in pawn score
       if (pt == PAWN)
@@ -306,10 +416,12 @@ void init(const Variant* v) {
       for (Square s = SQ_A1; s <= SQ_MAX; ++s)
       {
           File f = std::max(File(edge_distance(file_of(s), v->maxFile)), FILE_A);
+          File m_f = std::min(file_of(s), File(~file_of(s)));
           Rank r = rank_of(s);
           psq[ pc][s] = score + (  pt == PAWN  ? PBonus[std::min(r, RANK_8)][std::min(file_of(s), FILE_H)]
                                  : pt == KING  ? KingBonus[std::clamp(Rank(r - pawnRank + 1), RANK_1, RANK_8)][std::min(f, FILE_D)] * (1 + v->capturesToHand)
                                  : pt <= QUEEN ? Bonus[pc][std::min(r, RANK_8)][std::min(f, FILE_D)] * (1 + v->blastOnCapture)
+                                 : pt >= ARCHBISHOP && pt <= FORTRESS ? MusketeerBonus[pt - ARCHBISHOP][std::min(r, RANK_8)][m_f]
                                  : pt == HORSE ? Bonus[KNIGHT][std::min(r, RANK_8)][std::min(f, FILE_D)]
                                  : pt == COMMONER && v->extinctionValue == -VALUE_MATE && v->extinctionPieceTypes.find(COMMONER) != v->extinctionPieceTypes.end() ? KingBonus[std::clamp(Rank(r - pawnRank + 1), RANK_1, RANK_8)][std::min(f, FILE_D)]
                                  : isSlider    ? make_score(5, 5) * (2 * f + std::max(std::min(r, Rank(v->maxRank - r)), RANK_1) - v->maxFile - 1)
@@ -332,6 +444,7 @@ void init(const Variant* v) {
               psq[pc][s] += make_score(100, 0);
           psq[~pc][rank_of(s) <= v->maxRank ? flip_rank(s, v->maxRank) : s] = -psq[pc][s];
       }
+      
       // Pieces in hand
       psq[ pc][SQ_NONE] = score + make_score(35, 10) * (1 + !isSlider);
       psq[~pc][SQ_NONE] = -psq[pc][SQ_NONE];

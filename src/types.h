@@ -259,7 +259,9 @@ enum MoveType : int {
   DROP               = 4 << (2 * SQUARE_BITS),
   PIECE_PROMOTION    = 5 << (2 * SQUARE_BITS),
   PIECE_DEMOTION     = 6 << (2 * SQUARE_BITS),
-  SPECIAL            = 7 << (2 * SQUARE_BITS),
+  SET_GATING_TYPE    = 7 << (2 * SQUARE_BITS),
+  PUT_GATING_PIECE   = 8 << (2 * SQUARE_BITS),
+  SPECIAL            = 9 << (2 * SQUARE_BITS),
 };
 
 constexpr int MOVE_TYPE_BITS = 4;
@@ -302,6 +304,13 @@ enum EnclosingRule {
 
 enum OptBool {
   NO_VALUE, VALUE_FALSE, VALUE_TRUE
+};
+
+enum GamePhase {
+  GAMEPHASE_SELECTION,
+  GAMEPHASE_PLACING,
+  GAMEPHASE_PLAYING,
+  GAMEPHASE_NB
 };
 
 enum Phase {
@@ -376,20 +385,38 @@ enum Value : int {
   WazirValueMg             = 400,   WazirValueEg             = 350,
   CommonerValueMg          = 700,   CommonerValueEg          = 900,
   CentaurValueMg           = 1800,  CentaurValueEg           = 1900,
+  // Extra musketeer values
+  MusketeerCannonValueMg   = 1710,  MusketeerCannonValueEg   = 2239,
+  LeopardValueMg           = 1648,  LeopardValueEg           = 2014,
+  SpiderValueMg            = 2321,  SpiderValueEg            = 2718,
+  UnicornValueMg           = 1584,  UnicornValueEg           = 1772,
+  HawkValueMg              = 1537,  HawkValueEg              = 1561,
+  MusketeerElephantValueMg = 1770,  MusketeerElephantValueEg = 2000,
+  FortressValueMg          = 1956,  FortressValueEg          = 2100,
 
   MidgameLimit  = 15258, EndgameLimit  = 3915
 };
 
 constexpr int PIECE_TYPE_BITS = 6; // PIECE_TYPE_NB = pow(2, PIECE_TYPE_BITS)
+const int MAX_GATES = 2;
+
+enum Gate {
+  NO_GATE, GATE_1, GATE_2,
+  GATE_NB = MAX_GATES + 1
+};
 
 enum PieceType {
   NO_PIECE_TYPE, PAWN, KNIGHT, BISHOP, ROOK, QUEEN,
   FERS, MET = FERS, ALFIL, FERS_ALFIL, SILVER, KHON = SILVER, AIWOK, BERS, DRAGON = BERS,
-  ARCHBISHOP, CHANCELLOR, AMAZON, KNIBIS, BISKNI, KNIROO, ROOKNI,
+  KNIBIS, BISKNI, KNIROO, ROOKNI,
   SHOGI_PAWN, LANCE, SHOGI_KNIGHT, GOLD, DRAGON_HORSE,
   CLOBBER_PIECE, BREAKTHROUGH_PIECE, IMMOBILE_PIECE, CANNON, JANGGI_CANNON,
   SOLDIER, HORSE, ELEPHANT, JANGGI_ELEPHANT, BANNER,
   WAZIR, COMMONER, CENTAUR,
+  // Musketeer piece types
+  ARCHBISHOP, CHANCELLOR, AMAZON, 
+  // Extra musketeer piece types
+  MUSKETEER_CANNON, LEOPARD, SPIDER, UNICORN, HAWK, MUSKETEER_ELEPHANT, FORTRESS,
 
   CUSTOM_PIECES,
   FAIRY_PIECES = QUEEN + 1,
@@ -399,6 +426,7 @@ enum PieceType {
   CUSTOM_PIECES_END = KING - 1,
   CUSTOM_PIECES_NB = CUSTOM_PIECES_END - CUSTOM_PIECES + 1,
   ALL_PIECES = 0,
+  MUSKETEER_PIECES_NB = FORTRESS - ARCHBISHOP + 1
 };
 static_assert(KING < PIECE_TYPE_NB, "KING exceeds PIECE_TYPE_NB.");
 static_assert(PIECE_TYPE_BITS <= 6, "PIECE_TYPE uses more than 6 bit");
@@ -582,9 +610,11 @@ constexpr T operator-(T d) { return T(-int(d)); }                  \
 inline T& operator+=(T& d1, int d2) { return d1 = d1 + d2; }       \
 inline T& operator-=(T& d1, int d2) { return d1 = d1 - d2; }
 
-#define ENABLE_INCR_OPERATORS_ON(T)                                \
-inline T& operator++(T& d) { return d = T(int(d) + 1); }           \
-inline T& operator--(T& d) { return d = T(int(d) - 1); }
+#define ENABLE_INCR_OPERATORS_ON(T)                                      \
+inline T& operator++(T& d) { return d = T(int(d) + 1); }                 \
+inline T& operator--(T& d) { return d = T(int(d) - 1); }                 \
+inline T operator++(T& d, int) { T a = d; d = T(int(d) + 1); return a; } \
+inline T operator--(T& d, int) { T a = d; d = T(int(d) - 1); return a; }
 
 #define ENABLE_FULL_OPERATORS_ON(T)                                \
 ENABLE_BASE_OPERATORS_ON(T)                                        \
@@ -598,6 +628,7 @@ inline T& operator/=(T& d, int i) { return d = T(int(d) / i); }
 ENABLE_FULL_OPERATORS_ON(Value)
 ENABLE_FULL_OPERATORS_ON(Direction)
 
+ENABLE_INCR_OPERATORS_ON(Gate)
 ENABLE_INCR_OPERATORS_ON(Piece)
 ENABLE_INCR_OPERATORS_ON(PieceType)
 ENABLE_INCR_OPERATORS_ON(Square)
@@ -621,6 +652,10 @@ constexpr Square operator+(Square s, Direction d) { return Square(int(s) + int(d
 constexpr Square operator-(Square s, Direction d) { return Square(int(s) - int(d)); }
 inline Square& operator+=(Square& s, Direction d) { return s = s + d; }
 inline Square& operator-=(Square& s, Direction d) { return s = s - d; }
+
+constexpr File operator~(File f) {
+  return File(f ^ FILE_H); // Horizontal flip FILE_A -> FILE_H
+}
 
 /// Only declared but not defined. We don't want to multiply two scores due to
 /// a very high risk of overflow. So user should explicitly convert to integer.
@@ -763,6 +798,10 @@ inline bool is_pass(Move m) {
   return type_of(m) == SPECIAL && from_sq(m) == to_sq(m);
 }
 
+inline PieceType musketeer_gating_type(Move m) {
+  return type_of(m) == SET_GATING_TYPE || type_of(m) == PUT_GATING_PIECE ? PieceType((m >> (2 * SQUARE_BITS + MOVE_TYPE_BITS)) & (PIECE_TYPE_NB - 1)) : NO_PIECE_TYPE;
+}
+
 constexpr Move make_move(Square from, Square to) {
   return Move((from << SQUARE_BITS) + to);
 }
@@ -798,7 +837,7 @@ inline bool is_custom(PieceType pt) {
 }
 
 inline bool is_ok(Move m) {
-  return from_sq(m) != to_sq(m) || type_of(m) == PROMOTION || type_of(m) == SPECIAL; // Catch MOVE_NULL and MOVE_NONE
+  return from_sq(m) != to_sq(m) || type_of(m) == PROMOTION || type_of(m) == SET_GATING_TYPE || type_of(m) == PUT_GATING_PIECE || type_of(m) == SPECIAL; // Catch MOVE_NULL and MOVE_NONE
 }
 
 inline int dist(Direction d) {

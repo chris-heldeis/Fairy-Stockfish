@@ -224,6 +224,7 @@ namespace {
 
   // KingAttackWeights[PieceType] contains king attack weights by piece type
   constexpr int KingAttackWeights[PIECE_TYPE_NB] = { 0, 0, 81, 52, 44, 10, 40 };
+  constexpr int Musketeer_KingAttackWeights[MUSKETEER_CANNON] = { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 };
 
   // SafeCheck[PieceType][single/multiple] contains safe check bonus by piece type,
   // higher if multiple safe checks are possible for that piece type.
@@ -249,6 +250,58 @@ namespace {
       S( 69,124), S( 70,128), S( 70,132), S( 70,133) ,S( 71,136), S( 72,140),
       S( 74,147), S( 76,149), S( 90,153), S(104,169), S(105,171), S(106,171),
       S(112,178), S(114,185), S(114,187), S(119,221) }
+  };
+  constexpr Score Musketeer_MobilityBonus[MUSKETEER_PIECES_NB][4 * RANK_NB + 3] = {
+    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Archbishops
+      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
+      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
+      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
+      S(106,184), S(109,191), S(113,206), S(116,212) },
+    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Chancellors
+      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
+      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
+      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
+      S(106,184), S(109,191), S(113,206), S(116,212) },
+    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Dragons
+      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
+      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
+      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
+      S(106,184), S(109,191), S(113,206), S(116,212) },
+    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Cannons
+      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
+      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
+      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
+      S(106,184), S(109,191), S(113,206), S(116,212) },
+    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Leopards
+      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
+      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
+      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
+      S(106,184), S(109,191), S(113,206), S(116,212) },
+    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Spiders
+      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
+      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
+      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
+      S(106,184), S(109,191), S(113,206), S(116,212) },
+    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Unicorns
+      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
+      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
+      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
+      S(106,184), S(109,191), S(113,206), S(116,212) },
+    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Hawks
+      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
+      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
+      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
+      S(106,184), S(109,191), S(113,206), S(116,212) },
+    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Elephants
+      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
+      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
+      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
+      S(106,184), S(109,191), S(113,206), S(116,212) },
+    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Fortresses
+      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
+      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
+      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
+      S(106,184), S(109,191), S(113,206), S(116,212) }
   };
   constexpr Score MaxMobility  = S(150, 200);
   constexpr Score DropMobility = S(10, 10);
@@ -477,7 +530,9 @@ namespace {
         if (b & kingRing[Them])
         {
             kingAttackersCount[Us]++;
-            kingAttackersWeight[Us] += KingAttackWeights[std::min(Pt, FAIRY_PIECES)];
+            int weight = Pt >= ARCHBISHOP && Pt <= FORTRESS ? Musketeer_KingAttackWeights[Pt - ARCHBISHOP]
+                : KingAttackWeights[std::min(Pt, FAIRY_PIECES)];
+            kingAttackersWeight[Us] += weight;
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
 
@@ -493,6 +548,8 @@ namespace {
         int mob = popcount(b & mobilityArea[Us]);
         if (Pt <= QUEEN)
             mobility[Us] += MobilityBonus[Pt - 2][mob];
+        else if (Pt >= ARCHBISHOP && Pt <= FORTRESS)
+            mobility[Us] += Musketeer_MobilityBonus[Pt - ARCHBISHOP][mob];
         else
             mobility[Us] += MaxMobility * (mob - 2) / (8 + mob);
 
@@ -636,7 +693,9 @@ namespace {
         if ((b & kingRing[Them]) && pt != SHOGI_PAWN)
         {
             kingAttackersCountInHand[Us] += pos.count_in_hand(Us, pt);
-            kingAttackersWeightInHand[Us] += KingAttackWeights[std::min(pt, FAIRY_PIECES)] * pos.count_in_hand(Us, pt);
+            int weight = pt >= ARCHBISHOP && pt <= FORTRESS ? Musketeer_KingAttackWeights[pt - ARCHBISHOP]
+                : KingAttackWeights[std::min(pt, FAIRY_PIECES)];
+            kingAttackersWeightInHand[Us] += weight * pos.count_in_hand(Us, pt);
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
         Bitboard theirHalf = pos.board_bb() & ~forward_ranks_bb(Them, relative_rank(Them, Rank((pos.max_rank() - 1) / 2), pos.max_rank()));

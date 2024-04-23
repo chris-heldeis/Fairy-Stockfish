@@ -69,6 +69,12 @@ namespace {
             *moveList++ = make<PIECE_PROMOTION>(to - D, to);
     }
 
+    if (Type == QUIETS || Type == EVASIONS || Type == NON_EVASIONS)
+    {
+        for (Gate g = GATE_1; g < GATE_NB; g++)
+            *moveList++ = make<PROMOTION>(to - D, to, pos.gating_piece(g));
+    }
+
     return moveList;
   }
 
@@ -421,6 +427,43 @@ ExtMove* generate(const Position& pos, ExtMove* moveList) {
   static_assert(Type != LEGAL, "Unsupported type in generate()");
   assert((Type == EVASIONS) == (bool)pos.checkers());
 
+  if (pos.game_phase() != GAMEPHASE_PLAYING)
+  {
+      if (Type == QUIETS || Type == NON_EVASIONS)
+          return pos.game_phase() == GAMEPHASE_SELECTION ? generate<SELECTIONS>(pos, moveList) : generate<PLACEMENTS>(pos, moveList);
+      else
+          return moveList;
+  }
+
+  if (Type == SELECTIONS)
+  {
+      for (PieceType pt = ARCHBISHOP; pt <= AMAZON; ++pt)
+          *moveList++ = make<SET_GATING_TYPE>(SQ_A1, SQ_A1, pt);
+      for (PieceType pt = MUSKETEER_CANNON; pt <= FORTRESS; ++pt)
+          *moveList++ = make<SET_GATING_TYPE>(SQ_A1, SQ_A1, pt);
+
+      return moveList;
+  }
+
+  if (Type == PLACEMENTS)
+  {
+      Color us = pos.side_to_move();
+      assert(pos.setup_count(us) < GATE_NB);
+
+      Bitboard b = (us == WHITE ? Rank1BB : Rank8BB) & ~pos.gates();
+      // King and rook are mutually exclusive gates
+      if (pos.pieces(us, KING) & pos.gates())
+          b &= ~pos.pieces(us, ROOK);
+      else if (pos.pieces(us, ROOK) & pos.gates())
+          b &= ~pos.pieces(us, KING);
+      PieceType pt = pos.gating_piece(Gate(pos.setup_count(us) + 1));
+
+      while (b)
+          *moveList++ = make<PUT_GATING_PIECE>(SQ_A1, pop_lsb(b), pt);
+
+      return moveList;
+  }
+
   Color us = pos.side_to_move();
 
   return us == WHITE ? generate_all<WHITE, Type>(pos, moveList)
@@ -433,7 +476,8 @@ template ExtMove* generate<QUIETS>(const Position&, ExtMove*);
 template ExtMove* generate<EVASIONS>(const Position&, ExtMove*);
 template ExtMove* generate<QUIET_CHECKS>(const Position&, ExtMove*);
 template ExtMove* generate<NON_EVASIONS>(const Position&, ExtMove*);
-
+template ExtMove* generate<SELECTIONS>(const Position&, ExtMove*);
+template ExtMove* generate<PLACEMENTS>(const Position&, ExtMove*);
 
 /// generate<LEGAL> generates all the legal moves in the given position
 

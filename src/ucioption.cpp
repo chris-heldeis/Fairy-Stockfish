@@ -98,9 +98,14 @@ void on_variant_change(const Option &o) {
                       << sync_endl;
             return;
         }
+
+        int max_rank = v->maxRank + 1;
+        if (v->musketeerGating)
+            max_rank = 10;
+
         // Send setup command
         sync_cout << "setup (" << v->pieceToCharTable << ") "
-                  << v->maxFile + 1 << "x" << v->maxRank + 1
+                  << v->maxFile + 1 << "x" << max_rank
                   << "+" << pocketsize << "_" << v->variantTemplate
                   << " " << v->startFen
                   << sync_endl;
@@ -170,8 +175,8 @@ void init(OptionsMap& o) {
 
   constexpr int MaxHashMB = Is64Bit ? 33554432 : 2048;
 
-  o["Protocol"]              << Option("uci", {"uci", "usi", "ucci", "ucicyclone", "xboard"});
-  o["Debug Log File"]        << Option("", on_logger);
+  o["Protocol"]              << Option("xboard", {"uci", "usi", "ucci", "ucicyclone", "xboard"});
+  o["Debug Log File"]        << Option("log.txt", on_logger);
   o["Threads"]               << Option(1, 1, 512, on_threads);
   o["Hash"]                  << Option(16, 1, MaxHashMB, on_hash_size);
   o["Clear Hash"]            << Option(on_clear_hash);
@@ -182,7 +187,7 @@ void init(OptionsMap& o) {
   o["Slow Mover"]            << Option(100, 10, 1000);
   o["nodestime"]             << Option(0, 0, 10000);
   o["UCI_Chess960"]          << Option(false);
-  o["UCI_Variant"]           << Option("chess", variants.get_keys(), on_variant_change);
+  o["UCI_Variant"]           << Option("musketeer", variants.get_keys(), on_variant_change);
   o["UCI_AnalyseMode"]       << Option(false);
   o["UCI_LimitStrength"]     << Option(false);
   o["UCI_Elo"]               << Option(1350, 500, 2850);

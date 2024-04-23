@@ -217,6 +217,13 @@ void PieceMap::init(const Variant* v) {
   add(WAZIR, from_betza("W", "wazir"));
   add(COMMONER, from_betza("K", "commoner"));
   add(CENTAUR, from_betza("KN", "centaur"));
+  add(MUSKETEER_CANNON, from_betza("llNrrNDK", "musketeerCannon"));
+  add(LEOPARD, from_betza("NB2", "leopard"));
+  add(SPIDER, from_betza("B2DN", "spider"));
+  add(UNICORN, from_betza("CN", "unicorn"));
+  add(HAWK, from_betza("DHAG", "hawk"));
+  add(MUSKETEER_ELEPHANT, from_betza("KDA", "musketeerElephant"));
+  add(FORTRESS, from_betza("B3DfNbN", "fortress"));
   add(KING, from_betza("K", "king"));
   // Add custom pieces
   for (PieceType pt = CUSTOM_PIECES; pt <= CUSTOM_PIECES_END; ++pt)
